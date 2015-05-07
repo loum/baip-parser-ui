@@ -1,0 +1,66 @@
+{% extends '__autoindex__/macros.html' %}
+
+{% macro myentry(ent) %}
+  <tr>
+    {% set icon = ent.guess_icon() %}
+    <td class="icon">
+      {% if icon %}
+        <img src="{{ icon }}" />
+      {% endif %}
+    </td>
+    <td class="name">
+      <a href="{{ url_for(endpoint, path=ent.path) }}">
+      {%- if ent.name == ".." -%}
+        Parent folder
+      {%- else -%}
+        {{ ent.name }}
+      {%- endif -%}
+    </a></td>
+    <td class="modified">
+      <time datetime="{{ ent.modified }}">{{ ent.modified }}</time>
+    </td>
+    <td class="size">
+      {% if ent.size %}
+        {{ ent.size|filesizeformat }}
+      {% else %}
+        -
+      {% endif %}
+    </td>
+    {% if download_icon %}
+    <td class="icon">
+      <a style="margin-right:0px"
+         href="/parser/download_file/{{ ent.name }}">
+        <img style="display:block;
+                    margin-left:auto;
+                    margin-right:auto"
+             src="{{ download_icon }}" />
+      </a>
+    </td>
+    {% endif %}
+    {% if delete_icon %}
+    <td class="icon">
+      <a style="margin-right:0px"
+         href="/parser/delete_file/{{ ent.name }}">
+        <img style="display:block;
+                    margin-left:auto;
+                    margin-right:auto"
+             src="{{ delete_icon }}" />
+      </a>
+    </td>
+    {% endif %}
+  </tr>
+{% endmacro %}
+
+{% macro mythead() %}
+  <tr>
+    {{ th("name", "Name", 2) }}
+    {{ th("modified", "Last modified") }}
+    {{ th("size", "Size") }}
+    {% if download_icon %}
+      {{ th("download", "Download") }}
+    {% endif %}
+    {% if delete_icon %}
+      {{ th("delete", "Delete") }}
+    {% endif %}
+  </tr>
+{% endmacro %}

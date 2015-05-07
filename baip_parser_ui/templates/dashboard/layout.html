@@ -1,0 +1,97 @@
+{% from "macros.html" import myentry,
+                             mythead,
+                             breadcrumb with context -%}
+{% extends "layout.html" %}
+{% set title = '%s' % title if title else 'Dashboard' %}
+{% set pending_parse_header = '%s' % pending_parse_header if pending_parse_header else 'Pending Parse' %}
+{% set active_page = '%s' % active_page if active_page else 'dashboard' %}
+    {% block custom_head_link -%}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{{ url_for('__autoindex__.static', filename='autoindex.css') }}">
+    {% endblock custom_head_link %}
+
+        {% block content %}
+        <div class="col-sm-9
+                    col-sm-offset-3
+                    col-md-10
+                    col-md-offset-2
+                    main">
+          {% block steps %}
+          <h3 class="page-header">Dashboard</h3>
+
+          <div class="row placeholders"
+               style="background-color:#f4f4f4;
+                      border-radius:5px;
+                      padding-top:20px;
+                      padding-bottom:20px">
+            <div class="col-md-2 product">
+              <a href="/parser/upload">
+                {% block upload_step %}
+                <img src="/static/images/document-arrow-up-icon.png"
+                     style="width:80px;height:80px"
+                     class="img-responsive"
+                     alt="Upload files">
+                <span class="text-muted">Upload files</span>
+                {% endblock upload_step %}
+              </a>
+            </div>
+            <div class="col-md-1 product">
+              <img src="/static/images/arrow-right.png"
+                   alt="Arrow right"
+                   style="width:50px;height:50px">
+            </div>
+            <div class="col-md-2 product">
+              <a href="/parser/parse">
+                {% block parse_step %}
+                <img src="/static/images/parser.png"
+                     style="width:80px;height:80px"
+                     class="img-responsive"
+                     alt="Parse">
+                <span class="text-muted">Parse</span>
+                {% endblock parse_step %}
+              </a>
+            </div>
+            <div class="col-md-1">
+              <img src="/static/images/arrow-right.png"
+                   alt="Arrow right"
+                   style="width:50px;height:50px">
+            </div>
+            <div class="col-md-2 product">
+              <a href="/parser/download">
+                {% block download_step %}
+                <img src="/static/images/document-arrow-down-icon.png"
+                     style="width:80px;height:80px"
+                     class="img-responsive"
+                     alt="Download files">
+                <span class="text-muted">Download files</span>
+                {% endblock download_step %}
+              </a>
+            </div>
+          </div>
+          {% endblock steps %}
+
+          {% block pending_parse %}
+          <h4 class="sub-header">{{ pending_parse_header }}</h4>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+              {{ mythead() }}
+              {% if not curdir.is_root() %}
+                <tr>
+                  <td class="breadcrumb" colspan="4">
+                    <h1>{{ breadcrumb(curdir) }}</h1>
+                  </td>
+                </tr>
+              {% endif %}
+              </thead>
+              <tbody>
+              {% for ent in entries %}
+                {{ myentry(ent) }}
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endblock pending_parse %}
+        </div>
+        {% endblock content %}

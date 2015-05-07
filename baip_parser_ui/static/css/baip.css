@@ -1,0 +1,17 @@
+/* BAIP custom CSS
+ */
+#baip-row {
+    display: table;
+}
+
+#baip-row .baip-panel {
+    float: none;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/* Center an image
+ */
+.product .img-responsive {
+    margin: 0 auto;
+}

@@ -1,0 +1,67 @@
+{% extends "dashboard/layout.html" %}
+{% set title = 'Download files' %}
+{% set active_page = "download" %}
+        {% block content %}
+        <div class="col-sm-9
+                    col-sm-offset-3
+                    col-md-10
+                    col-md-offset-2
+                    main">
+          {% block steps %}
+          <h3 class="page-header">Download Files</h3>
+
+          <div id="baip-row"
+               class="row placeholders"
+               style="background-color:#f4f4f4;
+                      border-radius:5px;
+                      padding-top:20px;
+                      padding-bottom:20px">
+            <div class="col-md-3 product baip-panel">
+              {% block download_step %}
+              {{ super() }}
+              {% endblock download_step %}
+            </div>
+
+            <div class="col-md-1 baip-panel">
+              <img src="/static/images/arrow-right.png"
+                   alt="Arrow right"
+                   style="width:50px;height:50px">
+            </div>
+
+            <div class="col-md-3 product">
+              <a href="/parser/upload">
+                {% block upload_step %}
+                {{ super() }}
+                {% endblock upload_step %}
+              </a>
+            </div>
+
+          </div>
+
+          {% endblock steps %}
+          {%- block pending_parse %}{% endblock pending_parse -%}
+
+          {% block parsed_files %}
+          <h4 class="sub-header">Parsed</h4>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+              {{ mythead() }}
+              {% if not curdir.is_root() %}
+                <tr>
+                  <td class="breadcrumb" colspan="4">
+                    <h1>{{ breadcrumb(curdir) }}</h1>
+                  </td>
+                </tr>
+              {% endif %}
+              </thead>
+              <tbody>
+              {% for ent in entries %}
+                {{ myentry(ent) }}
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endblock parsed_files %}
+        </div>
+        {% endblock content %}

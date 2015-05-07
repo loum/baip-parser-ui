@@ -1,0 +1,103 @@
+{% extends "dashboard/layout.html" %}
+{% set title = 'Upload files' %}
+{% set active_page = "upload" %}
+    {% block custom_head_js %}
+    <script type="text/javascript">
+    //<![CDATA[
+    $(window).load(function(){
+        $(document).ready(function(){
+            $('input:file').change(function(){
+                $.getJSON('/parser/_extensions', {
+                    file_to_upload: $('input:file').val()
+                }, function(data) {
+                    if (data.extension_ok) {
+                        $('input:file').parent().attr('class',
+                                                      'has-success');
+
+                        $('#supported_ext').css("color", "green")
+
+                        if ($("#file_to_upload").val()){
+                            $('input:submit').removeAttr('disabled');
+                        }
+                        else {
+                            $('input:submit').attr('disabled', true);
+                        }
+                    }
+                    else {
+                        $('#supported_ext').css("color", "red")
+                        $('input:file').parent().attr('class',
+                                                      'has-error');
+
+                    }
+                });
+            });
+        });
+    });
+    //]]>
+    </script>
+    {% endblock custom_head_js %}
+        {% block content %}
+        <div class="col-sm-9
+                    col-sm-offset-3
+                    col-md-10
+                    col-md-offset-2
+                    main">
+          {% block steps %}
+          <h3 class="page-header">Upload Files</h3>
+
+          <div id="baip-row" class="row placeholders"
+               style="background-color:#f4f4f4;
+                      border-radius:5px;
+                      padding-top:20px;
+                      padding-bottom:20px">
+            <div class="col-md-6 baip-panel">
+              <form action="/parser/upload_file"
+                    method="post"
+                    enctype="multipart/form-data">
+                <div class="text-left">
+                  <span id="supported_ext"
+                        style="font-size:x-small;
+                               font-weight:bold;
+                               font-style:italic">
+                    Supported extensions: {{ extensions }}
+                  </span>
+                </div>
+                <div>
+                  <input name="file"
+                         id="file_to_upload""
+                         type="file"
+                         accept="{{ accept }}"
+                         class="filestyle"
+                         data-buttonBefore="true"
+                         data-buttonText="Find file">
+                </div>
+                <div style="float:left;
+                     padding-top:10px">
+                    <input type="submit"
+                           id="upload"
+                           class="btn btn-default"
+                           value="Upload"
+                           disabled="disabled">
+                </div>
+              </form>
+            </div>
+            <div class="col-xs-3 col-sm-2 col-md-1 baip-panel">
+              <img src="/static/images/arrow-right.png"
+                   alt="Arrow right"
+                   style="width:50px;height:50px">
+            </div>
+            <div class="col-xs-6 col-sm-3 col-md-5 product">
+              <a href="/parser/parse">
+                {% block parse_step %}
+                {{ super() }}
+                {% endblock parse_step %}
+              </a>
+            </div>
+          </div>
+
+          {% endblock steps %}
+          {% block pending_parse %}
+          {{ super() }}
+          {% endblock pending_parse %}
+        </div>
+        {% endblock content %}

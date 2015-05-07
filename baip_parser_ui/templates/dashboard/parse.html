@@ -1,0 +1,56 @@
+{% extends "dashboard/layout.html" %}
+{% set title = "Parse" %}
+{% set active_page = "parse" %}
+{% set pending_parse_header = '%s' % 'Parse Complete' if status else 'Pending Parse' %}
+        {% block content %}
+        <div class="col-sm-9
+                    col-sm-offset-3
+                    col-md-10
+                    col-md-offset-2
+                    main">
+          {% block steps %}
+          <h3 class="page-header">Parse</h3>
+
+          <div id="baip-row"
+               class="row placeholders"
+               style="background-color:#f4f4f4;
+                      border-radius:5px;
+                      padding-top:20px;
+                      padding-bottom:20px">
+            <div class="col-md-3 baip-panel">
+              <form action="/parser/parse"
+                    method="post"
+                    enctype="multipart/form-data">
+                <div style="float: left">
+                    <input type="submit"
+                           id="parse"
+                           class="btn btn-default"
+                           value="Start Parse"
+                           {% if not enabled %}disabled{% endif %}>
+                </div>
+              </form>
+            </div>
+            <div class="col-md-1 baip-panel">
+              <img src="/static/images/arrow-right.png"
+                   alt="Arrow right"
+                   style="width:50px;height:50px">
+            </div>
+            <div class="col-md-3 product">
+              <a href="/parser/download">
+                {% block download_step %}
+                {{ super() }}
+                {% endblock download_step %}
+              </a>
+            </div>
+          </div>
+          {% endblock steps %}
+
+          {% if not status %}
+          {% block pending_parse %}
+          {{ super() }}
+          {% endblock pending_parse %}
+          {% else %}
+          <h4 class="sub-header">{{ pending_parse_header }}</h4>
+          {% endif %}
+        </div>
+        {% endblock content %}
