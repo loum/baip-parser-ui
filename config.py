@@ -1,18 +1,13 @@
 CSRF_ENABLED = True
 SECRET_KEY = 'you-will-never-guess'
 
-UPLOAD_DIR = '/tmp/uploads'
-ALLOWED_EXTENSIONS = set(['html', 'htm'])
+ALLOWED_EXTENSIONS = set(['xls', 'xlsx'])
 
 # Munger staging directory on the server.
-# STAGING_DIR = '/data/share/baip-munger/staging'
-STAGING_DIR = '/var/tmp/uploads'
+STAGING_DIR = '/var/tmp/baip-parser/staging'
 
 # Munger ready directory on the server.
-READY_DIR = '/var/tmp/ready'
+READY_DIR = '/var/tmp/baip-parser/ready'
 
 # Define the location of the Munger configuration file.
-MUNGER_CONF_FILE = 'baip_munger_ui/tests/files/baip-munger.xml'
-
-# Munger is ready for processing.
-MUNGER_ACTIONS = None
+PARSER_CONF_FILE = 'baip_parser_ui/tests/files/parser.conf'

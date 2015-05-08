@@ -4,6 +4,7 @@ import flask
 import werkzeug
 import os
 import urlparse
+import shutil
 
 import baip_parser_ui
 import baip_parser
@@ -67,22 +68,40 @@ def parse(path='.'):
     status = False
 
     if flask.request.method == 'POST':
+        config_file = baip_parser_ui.app.config['PARSER_CONF_FILE']
+        conf = baip_parser.ParserConfig(config_file)
+        conf.parse_config()
+
         in_dir = baip_parser_ui.app.config['STAGING_DIR']
-        log.debug('Parsing files: %s' % get_directory_files_list(in_dir))
+        files_to_process = get_directory_files_list(in_dir)
 
-        ready_dir = baip_parser_ui.app.config['READY_DIR']
-        for html_file in get_directory_files_list(in_dir):
-            target_file = os.path.join(ready_dir,
-                                       os.path.basename(html_file))
-
+        results = []
+        for file_to_process in files_to_process:
+            log.info('Processing file: %s' % file_to_process)
             parser = baip_parser.Parser()
+            parser.open(file_to_process)
+            log.debug('xxx: %s' % conf.cells_to_extract)
+            parser.cells_to_extract = conf.cells_to_extract
+            parser.skip_sheets = conf.skip_sheets
 
-            if status:
-                remove_files(html_file)
-            else:
-                break
+            results.append(parser.parse_sheets())
+
+        if len(results):
+            parserd = baip_parser.ParserDaemon(pidfile=None, conf=conf)
+            tmp_file = parserd.dump(results)
+
+            ready_dir = baip_parser_ui.app.config['READY_DIR']
+            target_file = os.path.join(ready_dir,
+                                       os.path.basename(tmp_file))
+            log.info('Moving "%s" to target "%s"' % (tmp_file, target_file))
+            shutil.move(tmp_file, target_file)
+
+            status = True
+            remove_files(files_to_process)
 
     enabled = False
+    if get_directory_files_list(baip_parser_ui.app.config['STAGING_DIR']):
+        enabled = True
     kwargs = {
         'path': path,
         'template': 'dashboard/parse.html',
@@ -110,7 +129,7 @@ def upload_file():
             extensions = baip_parser_ui.app.config['ALLOWED_EXTENSIONS']
             if allowed_file(source_file, extensions):
                 filename = werkzeug.secure_filename(source_file)
-                target = os.path.join(baip_parser_ui.app.config['UPLOAD_DIR'],
+                target = os.path.join(baip_parser_ui.app.config['STAGING_DIR'],
                                       filename)
                 file_storage.save(target)
                 log.info('%s uploaded to "%s"' % (log_msg, target))
@@ -180,7 +199,7 @@ def delete_file(filename):
     log.debug('File deletion referrer path: "%s"' %
               parsed_referrer_url.path)
 
-    delete_path = baip_parser_ui.app.config['UPLOAD_DIR']
+    delete_path = baip_parser_ui.app.config['STAGING_DIR']
     route = 'upload'
     if parsed_referrer_url.path == '/parser/download':
         delete_path = baip_parser_ui.app.config['READY_DIR']
